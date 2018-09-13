@@ -64,6 +64,7 @@ const extendWeb3OldWithRlay = web3 => {
       new web3._extend.Method({
         name: 'experimentalListCids',
         call: 'rlay_experimentalListCids',
+        params: 1,
       }),
     ],
   });
@@ -103,6 +104,7 @@ const extendWeb3WithRlay = web3 => {
       {
         name: 'experimentalListCids',
         call: 'rlay_experimentalListCids',
+        params: 1,
       },
     ],
   });
