@@ -66,6 +66,16 @@ const extendWeb3OldWithRlay = web3 => {
         call: 'rlay_experimentalListCids',
         params: 1,
       }),
+      new web3._extend.Method({
+        name: 'experimentalListCidsIndex',
+        call: 'rlay_experimentalListCidsIndex',
+        params: 3,
+      }),
+      new web3._extend.Method({
+        name: 'experimentalGetEntity',
+        call: 'rlay_experimentalGetEntity',
+        params: 1,
+      }),
     ],
   });
 };
@@ -106,6 +116,16 @@ const extendWeb3WithRlay = web3 => {
         call: 'rlay_experimentalListCids',
         params: 1,
       },
+      {
+        name: 'experimentalListCidsIndex',
+        call: 'rlay_experimentalListCidsIndex',
+        params: 3,
+      },
+      {
+        name: 'experimentalGetEntity',
+        call: 'rlay_experimentalGetEntity',
+        params: 1,
+      },
     ],
   });
 };
@@ -134,28 +154,33 @@ const store = (web3, entity, options) => {
 const retrieve = (web3, cid, options) => {
   const iface = ethersInterfaceOntologyStorage;
 
-  const ontologyAddress = web3.rlay
-    .version()
-    .then(version => version.contractAddresses.OntologyStorage);
-  const entityKind = web3.rlay
-    .experimentalKindForCid(cid)
-    .then(res => res.kind);
+  return web3.rlay.experimentalGetEntity(cid).then((entity) => {
+    if (entity) {
+      return Promise.resolve(entity);
+    }
+    const ontologyAddress = web3.rlay
+      .version()
+      .then(version => version.contractAddresses.OntologyStorage);
+    const entityKind = web3.rlay
+      .experimentalKindForCid(cid)
+      .then(res => res.kind);
 
-  return Promise.all([ontologyAddress, entityKind]).then(
-    ([ontologyAddress, entityKind]) => {
-      const data = encodeForRetrieve(entityKind, cid);
+    return Promise.all([ontologyAddress, entityKind]).then(
+      ([ontologyAddress, entityKind]) => {
+        const data = encodeForRetrieve(entityKind, cid);
 
-      return web3.eth
-        .call({
-          to: ontologyAddress,
-          data,
-          ...options,
-        })
-        .then(callResponseData =>
-          decodeFromRetrieve(entityKind, callResponseData),
-        );
-    },
-  );
+        return web3.eth
+          .call({
+            to: ontologyAddress,
+            data,
+            ...options,
+          })
+          .then(callResponseData =>
+            decodeFromRetrieve(entityKind, callResponseData),
+          );
+      },
+    );
+  })
 };
 
 const addWeight = (web3, cid, weight, options) => {
