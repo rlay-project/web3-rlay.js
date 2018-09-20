@@ -1,12 +1,17 @@
 {
   "name": "@rlay/web3-rlay",
   "version": "0.1.1",
-  "description": "",
+  "description": "Rlay submodule for web3",
+  "keywords": [
+    "rlay",
+    "web3",
+    "ethereum"
+  ]
   "main": "lib/index.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production rollup -c -o lib/index.js"
   },
-  "author": "",
+  "author": "Maximilian Goisser <max@rlay.com>",
   "license": "MIT OR Apache-2.0",
   "dependencies": {
     "cbor": "^4.1.1",
