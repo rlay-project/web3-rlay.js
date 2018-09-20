@@ -7,6 +7,11 @@
     "web3",
     "ethereum"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rlay-project/web3-rlay.js.git"
+  },
+  "homepage": "https://github.com/rlay-project/web3-rlay.js",
   "main": "lib/index.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production rollup -c -o lib/index.js"
