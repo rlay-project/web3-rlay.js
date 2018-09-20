@@ -1,12 +1,12 @@
 {
   "name": "@rlay/web3-rlay",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Rlay submodule for web3",
   "keywords": [
     "rlay",
     "web3",
     "ethereum"
-  ]
+  ],
   "main": "lib/index.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production rollup -c -o lib/index.js"
