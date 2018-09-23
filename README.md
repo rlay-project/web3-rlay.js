@@ -1,4 +1,4 @@
-# web3-rlay.js - Rlay submodule and helpers for web3.js
+# web3-rlay.js - Rlay submodule and helpers for [web3.js](https://github.com/ethereum/web3.js)
 
 ## Installation
 
