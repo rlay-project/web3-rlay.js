@@ -30,6 +30,33 @@ const ethersInterfaceOntologyStorage = buildEthersInterfaceOntologyStorage();
 const ethersInterfacePropositionLedger = buildEthersInterfacePropositionLedger();
 const ethersInterfaceRlayToken = buildEthersInterfaceRlayToken();
 
+const formatOutputGetPropostionPools = (web3, pool) => {
+  const toBN = web3.toBigNubmer || web3.utils.toBN;
+  const formatAssertion = (assertion) => ({
+    ...assertion,
+    totalWeight: toBN(assertion.totalWeight),
+  })
+
+  const formatPool = (pool) => {
+    pool.aggregatedValue = pool.aggregatedValue ? formatAssertion(pool.aggregatedValue) : null;
+    pool.canonicalNegativeValue = formatAssertion(pool.canonicalNegativeValue);
+    pool.canonicalPositiveValue = formatAssertion(pool.canonicalPositiveValue);
+
+    pool.values = pool.values.map(formatAssertion);
+    pool.positiveValues = pool.positiveValues.map(formatAssertion);
+    pool.negativeValues = pool.negativeValues.map(formatAssertion);
+
+    pool.totalWeight = toBN(pool.totalWeight);
+    pool.totalWeightAggregationResult = pool.totalWeightAggregationResult ? toBN(pool.totalWeightAggregationResult) : null;
+    pool.totalWeightNegative = toBN(pool.totalWeightNegative);
+    pool.totalWeightPositive = toBN(pool.totalWeightPositive);
+
+    return pool;
+  };
+
+  return formatPool(pool);
+};
+
 // Extend web3 0.20.x with custom Rlay RPC methods.
 const extendWeb3OldWithRlay = web3 => {
   web3._extend({
@@ -42,19 +69,8 @@ const extendWeb3OldWithRlay = web3 => {
       new web3._extend.Method({
         name: 'getPropositionPools',
         call: 'rlay_getPropositionPools',
-        outputFormatter: pools => {
-          const formattedPools = pools.map(pool => {
-            pool.totalWeight = web3.toBigNumber(pool.totalWeight);
-            pool.values = pool.values.map(value => {
-              value.totalWeight = web3.toBigNumber(value.totalWeight);
-
-              return value;
-            });
-
-            return pool;
-          });
-          return formattedPools;
-        },
+        params: 1,
+        outputFormatter: (pools) => formatOutputGetPropostionPools(web3, pools),
       }),
       new web3._extend.Method({
         name: 'experimentalKindForCid',
@@ -92,19 +108,8 @@ const extendWeb3WithRlay = web3 => {
       {
         name: 'getPropositionPools',
         call: 'rlay_getPropositionPools',
-        outputFormatter: pools => {
-          const formattedPools = pools.map(pool => {
-            pool.totalWeight = web3.toBigNumber(pool.totalWeight);
-            pool.values = pool.values.map(value => {
-              value.totalWeight = web3.toBigNumber(value.totalWeight);
-
-              return value;
-            });
-
-            return pool;
-          });
-          return formattedPools;
-        },
+        params: 1,
+        outputFormatter: (pools) => formatOutputGetPropostionPools(web3, pools),
       },
       {
         name: 'experimentalKindForCid',
