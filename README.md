@@ -1,5 +1,7 @@
 # web3-rlay.js - Rlay submodule and helpers for [web3.js](https://github.com/ethereum/web3.js)
 
+[![npm (scoped)](https://img.shields.io/npm/v/@rlay/web3-rlay.svg?style=flat-square)](https://www.npmjs.com/package/@rlay/web3-rlay) ![NpmLicense](https://img.shields.io/npm/l/@rlay/web3-rlay.svg?style=flat-square)
+
 ## Installation
 
 ### Node.js
