@@ -188,8 +188,7 @@ const retrieve = (web3, cid, options) => {
   })
 };
 
-const addWeight = (web3, cid, weight, options) => {
-  const iface = ethersInterfacePropositionLedger;
+const setAllowance = (web3, weight, options) => {
   const tokenInterface = ethersInterfaceRlayToken;
 
   const contractAddresses = web3.rlay
@@ -203,15 +202,37 @@ const addWeight = (web3, cid, weight, options) => {
       weight,
     ).data;
 
+    return web3.eth
+        .sendTransaction({
+          to: contractAddresses.RlayToken,
+          data: approveEncoded,
+          ...options,
+        });
+  });
+};
+
+const addWeight = (web3, cid, weight, options) => {
+  const iface = ethersInterfacePropositionLedger;
+
+  const doSetAllowance = options.setAllowance;
+  delete options.allowance;
+
+  const contractAddresses = web3.rlay
+    .version()
+    .then(version => version.contractAddresses);
+
+  return contractAddresses.then(contractAddresses => {
     const submitPropositionFn = iface.functions['submitProposition'];
     const submitPropositionEncoded = submitPropositionFn(cid, weight).data;
 
-    return web3.eth
-      .sendTransaction({
-        to: contractAddresses.RlayToken,
-        data: approveEncoded,
-        ...options,
-      })
+    let approvePr;
+    if (doSetAllowance) {
+      approvePr = setAllowance(web3, weight, options);
+    } else {
+      approvePr = Promise.resolve(null);
+    }
+
+    return approvePr
       .then(() =>
         web3.eth.sendTransaction({
           to: contractAddresses.PropositionLedger,
@@ -281,6 +302,7 @@ const decodeValue = encoded =>
 module.exports = {
   store,
   retrieve,
+  setAllowance,
   addWeight,
 
   encodeValue,
