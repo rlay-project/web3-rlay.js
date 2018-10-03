@@ -57,6 +57,20 @@ const formatOutputGetPropostionPools = (web3, pool) => {
   return formatPool(pool);
 };
 
+const formatInputEntity = (web3, entity) => {
+    const newEntity = web3.utils._.mapObject(entity, (val, key) => {
+      if (key === 'type') {
+        return val;
+      }
+      if (Array.isArray(val)) {
+        return val.map(ethers.utils.hexlify);
+      } else {
+        return ethers.utils.hexlify(val);
+      }
+    });
+    return newEntity;
+};
+
 // Extend web3 0.20.x with custom Rlay RPC methods.
 const extendWeb3OldWithRlay = web3 => {
   web3._extend({
@@ -91,6 +105,12 @@ const extendWeb3OldWithRlay = web3 => {
         name: 'experimentalGetEntity',
         call: 'rlay_experimentalGetEntity',
         params: 1,
+      }),
+      new web3._extend.Method({
+        name: 'experimentalGetEntityCid',
+        call: 'rlay_experimentalGetEntityCid',
+        params: 1,
+        inputFormatter: [(entity) => formatInputEntity(web3, entity)],
       }),
     ],
   });
@@ -130,6 +150,12 @@ const extendWeb3WithRlay = web3 => {
         name: 'experimentalGetEntity',
         call: 'rlay_experimentalGetEntity',
         params: 1,
+      },
+      {
+        name: 'experimentalGetEntityCid',
+        call: 'rlay_experimentalGetEntityCid',
+        params: 1,
+        inputFormatter: [(entity) => formatInputEntity(web3, entity)],
       },
     ],
   });
@@ -215,7 +241,7 @@ const addWeight = (web3, cid, weight, options) => {
   const iface = ethersInterfacePropositionLedger;
 
   const doSetAllowance = options.setAllowance;
-  delete options.allowance;
+  delete options.setAllowance;
 
   const contractAddresses = web3.rlay
     .version()
