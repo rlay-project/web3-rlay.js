@@ -112,6 +112,12 @@ const extendWeb3OldWithRlay = web3 => {
         params: 1,
         inputFormatter: [(entity) => formatInputEntity(web3, entity)],
       }),
+      new web3._extend.Method({
+        name: 'experimentalStoreEntity',
+        call: 'rlay_experimentalStoreEntity',
+        params: 2,
+        inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
+      }),
     ],
   });
 };
@@ -157,6 +163,12 @@ const extendWeb3WithRlay = web3 => {
         params: 1,
         inputFormatter: [(entity) => formatInputEntity(web3, entity)],
       },
+      {
+        name: 'experimentalStoreEntity',
+        call: 'rlay_experimentalStoreEntity',
+        params: 2,
+        inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
+      },
     ],
   });
 };
@@ -166,6 +178,10 @@ const store = (web3, entity, options) => {
 
   const storeFnName = `store${entity.type}`;
   const contractFn = iface.functions[storeFnName];
+
+  if (options.backend) {
+    return web3.rlay.experimentalStoreEntity(entity, { backend: options.backend });
+  }
 
   return web3.rlay
     .version()
