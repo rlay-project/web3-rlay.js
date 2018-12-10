@@ -104,7 +104,7 @@ const extendWeb3OldWithRlay = web3 => {
       new web3._extend.Method({
         name: 'experimentalGetEntity',
         call: 'rlay_experimentalGetEntity',
-        params: 1,
+        params: 2,
       }),
       new web3._extend.Method({
         name: 'experimentalGetEntityCid',
@@ -155,7 +155,7 @@ const extendWeb3WithRlay = web3 => {
       {
         name: 'experimentalGetEntity',
         call: 'rlay_experimentalGetEntity',
-        params: 1,
+        params: 2,
       },
       {
         name: 'experimentalGetEntityCid',
