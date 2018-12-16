@@ -204,8 +204,8 @@ const store = (web3, entity, options = {}) => {
     });
 };
 
-const retrieve = (web3, cid, options) => {
-  return web3.rlay.experimentalGetEntity(cid).then((entity) => {
+const retrieve = (web3, cid, options = {}) => {
+  return web3.rlay.experimentalGetEntity(cid, options).then((entity) => {
     if (entity) {
       return Promise.resolve(entity);
     }
