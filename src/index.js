@@ -1,16 +1,8 @@
 const ethers = require('ethers');
 const cbor = require('cbor');
-const ontologyContractJson = require('./OntologyStorage.json');
 const propositionLedgerContractJson = require('./PropositionLedger.json');
 const tokenContractJson = require('./RlayToken.json');
 const builtins = require('./builtins.json');
-
-const buildEthersInterfaceOntologyStorage = () => {
-  const abi = ontologyContractJson.abi;
-  const contract = new ethers.Interface(abi);
-
-  return contract;
-};
 
 const buildEthersInterfacePropositionLedger = () => {
   const abi = propositionLedgerContractJson.abi;
@@ -26,7 +18,6 @@ const buildEthersInterfaceRlayToken = () => {
   return contract;
 };
 
-const ethersInterfaceOntologyStorage = buildEthersInterfaceOntologyStorage();
 const ethersInterfacePropositionLedger = buildEthersInterfacePropositionLedger();
 const ethersInterfaceRlayToken = buildEthersInterfaceRlayToken();
 
@@ -118,6 +109,12 @@ const extendWeb3OldWithRlay = web3 => {
         params: 2,
         inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
       }),
+      new web3._extend.Method({
+        name: 'encodeForStore',
+        call: 'rlay_encodeForStore',
+        params: 2,
+        inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
+      }),
     ],
   });
 };
@@ -169,38 +166,45 @@ const extendWeb3WithRlay = web3 => {
         params: 2,
         inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
       },
+      {
+        name: 'encodeForStore',
+        call: 'rlay_encodeForStore',
+        params: 2,
+        inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
+      },
     ],
   });
 };
 
-const store = (web3, entity, options) => {
-  const iface = ethersInterfaceOntologyStorage;
-
-  const storeFnName = `store${entity.type}`;
-  const contractFn = iface.functions[storeFnName];
-
+const store = (web3, entity, options = {}) => {
   if (options.backend) {
     return web3.rlay.experimentalStoreEntity(entity, { backend: options.backend });
   }
 
-  return web3.rlay
-    .version()
-    .then(version => version.contractAddresses.OntologyStorage)
-    .then(ontologyAddress => {
-      const data = encodeForStore(entity);
+  return web3.rlay.encodeForStore(entity, options)
+    .then((encodeForStoreRes) => {
+      const transactionData = encodeForStoreRes.data;
 
-      return web3.eth.sendTransaction({
-        to: ontologyAddress,
-        data,
-        ...options,
-      });
-    })
-    .then(storeTx => contractFn.parseResult(storeTx.logs[0].data)[0]);
+      return web3.rlay
+        .version()
+        .then(version => version.contractAddresses.OntologyStorage)
+        .then(ontologyAddress => {
+          return web3.eth.sendTransaction({
+            to: ontologyAddress,
+            data: transactionData,
+            ...options,
+          });
+        })
+        .then((storeTx) => {
+          const coder = new ethers.utils.AbiCoder();
+          const decoded = coder.decode(['bytes'], storeTx.logs[0].data);
+
+          return decoded[0];
+        });
+    });
 };
 
 const retrieve = (web3, cid, options) => {
-  const iface = ethersInterfaceOntologyStorage;
-
   return web3.rlay.experimentalGetEntity(cid).then((entity) => {
     if (entity) {
       return Promise.resolve(entity);
@@ -285,29 +289,6 @@ const addWeight = (web3, cid, weight, options) => {
   });
 };
 
-const encodeForStore = entity => {
-  const iface = ethersInterfaceOntologyStorage;
-
-  const storeFnName = `store${entity.type}`;
-  const contractFn = iface.functions[storeFnName];
-
-  const params = [];
-  contractFn.inputs.names.forEach((paramName, paramIdx) => {
-    const paramType = contractFn.inputs.types[paramIdx];
-    let nullValue = '0x';
-    if (paramType.endsWith('[]')) {
-      nullValue = [];
-    }
-
-    params.push(
-      entity[paramName] || entity[paramName.replace('_', '')] || nullValue,
-    );
-  });
-  const encoded = contractFn(...params);
-
-  return encoded.data;
-};
-
 const encodeForRetrieve = (entityKind, cid) => {
   const iface = ethersInterfaceOntologyStorage;
 
@@ -350,7 +331,6 @@ module.exports = {
   encodeValue,
   decodeValue,
 
-  encodeForStore,
   extendWeb3WithRlay,
   extendWeb3OldWithRlay,
 

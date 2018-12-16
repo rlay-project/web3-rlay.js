@@ -19,7 +19,6 @@ const config = {
     copy({
       verbose: true,
       "src/builtins.json": "lib/builtins.json",
-      "src/OntologyStorage.json": "lib/OntologyStorage.json",
       "src/PropositionLedger.json": "lib/PropositionLedger.json",
       "src/RlayToken.json": "lib/RlayToken.json",
     }),
