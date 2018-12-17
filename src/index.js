@@ -110,6 +110,11 @@ const extendWeb3OldWithRlay = web3 => {
         inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
       }),
       new web3._extend.Method({
+        name: 'experimentalNeo4jQuery',
+        call: 'rlay_experimentalNeo4jQuery',
+        params: 2,
+      }),
+      new web3._extend.Method({
         name: 'encodeForStore',
         call: 'rlay_encodeForStore',
         params: 2,
@@ -165,6 +170,11 @@ const extendWeb3WithRlay = web3 => {
         call: 'rlay_experimentalStoreEntity',
         params: 2,
         inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
+      },
+      {
+        name: 'experimentalNeo4jQuery',
+        call: 'rlay_experimentalNeo4jQuery',
+        params: 2,
       },
       {
         name: 'encodeForStore',
