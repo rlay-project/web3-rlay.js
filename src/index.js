@@ -329,7 +329,7 @@ const decodeFromRetrieve = (entityKind, responseData) => {
 
 const encodeValue = val => {
   /**
-   * bytesToHex is a copy from:
+   * bytesToHex is adapted from:
    * https://github.com/ethereum/web3.js/blob/aaf26c8806bc9fb60cf6dcb6658104963c6c7fc7/packages/web3-utils/src/Utils.js#L345
    */
   const bytesToHex = (bytes) => {
@@ -340,7 +340,7 @@ const encodeValue = val => {
       hex.push((bytes[i] & 0xf).toString(16));
     }
 
-    return `0x${hex.join('').replace(/^0+/, '')}`;
+    return `0x${hex.join('')}`;
   };
 
   return bytesToHex(cbor.encode(val));
