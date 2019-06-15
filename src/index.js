@@ -327,7 +327,24 @@ const decodeFromRetrieve = (entityKind, responseData) => {
   return entity;
 };
 
-const encodeValue = val => cbor.encode(val);
+const encodeValue = val => {
+  /**
+   * bytesToHex is adapted from:
+   * https://github.com/ethereum/web3.js/blob/aaf26c8806bc9fb60cf6dcb6658104963c6c7fc7/packages/web3-utils/src/Utils.js#L345
+   */
+  const bytesToHex = (bytes) => {
+    let hex = [];
+
+    for (let i = 0; i < bytes.length; i++) {
+      hex.push((bytes[i] >>> 4).toString(16));
+      hex.push((bytes[i] & 0xf).toString(16));
+    }
+
+    return `0x${hex.join('')}`;
+  };
+
+  return bytesToHex(cbor.encode(val));
+}
 
 const decodeValue = encoded =>
   cbor.decodeFirstSync(encoded.substring(2, encoded.length));
