@@ -110,6 +110,12 @@ const extendWeb3OldWithRlay = web3 => {
         inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
       }),
       new web3._extend.Method({
+        name: 'experimentalStoreEntities',
+        call: 'rlay_experimentalStoreEntities',
+        params: 2,
+        inputFormatter: [(entities) => entities.map(entity => formatInputEntity(web3, entity)), null],
+      }),
+      new web3._extend.Method({
         name: 'experimentalNeo4jQuery',
         call: 'rlay_experimentalNeo4jQuery',
         params: 2,
@@ -172,6 +178,12 @@ const extendWeb3WithRlay = web3 => {
         inputFormatter: [(entity) => formatInputEntity(web3, entity), null],
       },
       {
+        name: 'experimentalStoreEntities',
+        call: 'rlay_experimentalStoreEntities',
+        params: 2,
+        inputFormatter: [(entities) => entities.map(entity => formatInputEntity(web3, entity)), null],
+      },
+      {
         name: 'experimentalNeo4jQuery',
         call: 'rlay_experimentalNeo4jQuery',
         params: 2,
@@ -212,6 +224,12 @@ const store = (web3, entity, options = {}) => {
           return decoded[0];
         });
     });
+};
+
+const storeEntities = (web3, entities, options = {}) => {
+  if (options.backend) {
+    return web3.rlay.experimentalStoreEntities(entities, { backend: options.backend });
+  }
 };
 
 const retrieve = (web3, cid, options = {}) => {
@@ -351,6 +369,7 @@ const decodeValue = encoded =>
 
 module.exports = {
   store,
+  storeEntities,
   retrieve,
   setAllowance,
   addWeight,
