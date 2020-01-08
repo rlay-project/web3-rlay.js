@@ -103,6 +103,16 @@ const extendWeb3OldWithRlay = web3 => {
         params: 2,
       }),
       new web3._extend.Method({
+        name: 'experimentalResolveEntity',
+        call: 'rlay_experimentalResolveEntity',
+        params: 2,
+      }),
+      new web3._extend.Method({
+        name: 'experimentalResolveEntities',
+        call: 'rlay_experimentalResolveEntities',
+        params: 2,
+      }),
+      new web3._extend.Method({
         name: 'experimentalGetEntityCid',
         call: 'rlay_experimentalGetEntityCid',
         params: 1,
@@ -173,6 +183,16 @@ const extendWeb3WithRlay = web3 => {
       {
         name: 'experimentalGetEntities',
         call: 'rlay_experimentalGetEntities',
+        params: 2,
+      },
+      {
+        name: 'experimentalResolveEntity',
+        call: 'rlay_experimentalResolveEntity',
+        params: 2,
+      },
+      {
+        name: 'experimentalResolveEntities',
+        call: 'rlay_experimentalResolveEntities',
         params: 2,
       },
       {
